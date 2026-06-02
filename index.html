@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique Concept - Papeterie & Box Sur-Mesure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF7A60;       /* Corail chaleureux */
+            --primary-hover: #E5654B;
+            --secondary: #FFB84C;     /* Jaune safran doux */
+            --bg-warm: #FFFDF9;       /* Blanc cassé */
+            --dark: #2D2724;          /* Marron très foncé */
+            --gray-light: #F7F4EF;
+            --border: #EFEAE2;
+            --shadow: 0 10px 30px rgba(255, 122, 96, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-warm); color: var(--dark); line-height: 1.6; }
+
+        header {
+            background: rgba(255, 253, 249, 0.85);
+            backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 1000;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-container {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center; padding: 20px;
+        }
+
+        .logo { font-weight: 700; font-size: 22px; color: var(--dark); text-decoration: none; }
+        .nav-links { display: flex; gap: 35px; list-style: none; }
+        .nav-links a { text-decoration: none; color: var(--dark); font-weight: 500; font-size: 15px; }
+        .nav-links a.active { color: var(--primary); }
+        .cart-status { background: var(--dark); color: #fff; padding: 8px 16px; border-radius: 30px; font-weight: 600; font-size: 14px; }
+
+        .hero {
+            max-width: 1200px; margin: 40px auto; padding: 60px 20px;
+            background: linear-gradient(135deg, #FFEFEA 0%, #FFF6E9 100%);
+            border-radius: 32px; text-align: center;
+        }
+
+        .hero h1 { font-size: 40px; font-weight: 700; margin-bottom: 16px; }
+        .hero p { font-size: 16px; color: #615551; max-width: 600px; margin: 0 auto; }
+
+        .main-container { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px 20px; }
+        .section-title { font-size: 24px; margin-bottom: 32px; }
+
+        .box-builder-interface {
+            display: grid; grid-template-columns: 7fr 4fr; gap: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .box-builder-interface { grid-template-columns: 1fr; }
+        }
+
+        .products-selector-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;
+        }
+
+        .selector-card {
+            border: 1px solid var(--border); border-radius: 16px; padding: 16px;
+            text-align: center; background: #fff; transition: all 0.3s;
+        }
+
+        .selector-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .selector-card .icon { font-size: 40px; margin-bottom: 10px; }
+        .selector-card h4 { font-size: 14px; margin-bottom: 4px; height: 40px; display: flex; align-items: center; justify-content: center;}
+        .selector-card .price { font-weight: 700; color: var(--primary); font-size: 15px; margin-bottom: 12px; }
+
+        .variation-select {
+            width: 100%; padding: 6px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--bg-warm); font-size: 12px; margin-bottom: 12px; outline: none;
+        }
+
+        .add-to-box-btn {
+            background: #fff; border: 1px solid var(--primary); color: var(--primary);
+            width: 100%; padding: 8px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+
+        .add-to-box-btn:hover { background: var(--primary); color: white; }
+
+        .box-summary-panel {
+            background: var(--gray-light); border-radius: 20px; padding: 24px; height: fit-content;
+        }
+
+        .customer-type-toggle { display: flex; background: var(--border); padding: 4px; border-radius: 12px; margin-bottom: 20px; }
+        .toggle-tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .toggle-tab.active { background: #fff; color: var(--dark); }
+
+        .wholesale-notice {
+            background: #FFF2DC; border-left: 4px solid var(--secondary); padding: 12px;
+            border-radius: 8px; font-size: 12px; margin-bottom: 20px; display: none;
+        }
+
+        .summary-items-list { list-style: none; margin-bottom: 20px; }
+        .summary-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px; border-bottom: 1px dashed #E0DCD5; }
+        .remove-item { color: #FF4D4D; cursor: pointer; font-weight: bold; margin-left: 8px; }
+
+        .total-row { display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; margin: 20px 0; padding-top: 16px; border-top: 2px solid var(--border); }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: #fff; font-size: 14px;
+        }
+
+        .submit-order-btn {
+            background: #25D366; color: white; border: none; width: 100%; padding: 16px;
+            border-radius: 12px; font-weight: 600; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .submit-order-btn:hover { background: #20BA56; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo">✨ Ma Boutique Kawaii</a>
+            <div class="cart-status">📦 <span id="cart-count">0</span> articles</div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Concoctez votre box sur-mesure 🇸🇳</h1>
+        <p>Sélectionnez vos articles. Les prix s'adaptent automatiquement pour les revendeurs (achat en gros).</p>
+    </section>
+
+    <main class="main-container">
+        <div class="box-builder-interface">
+            
+            <div class="products-selector-grid">
+                
+                <div class="selector-card">
+                    <div class="icon">🎒</div>
+                    <h4>Trousse garnie complète</h4>
+                    <p class="price" id="p1-price">3 500 FCFA</p>
+                    <select class="variation-select" id="p1-var">
+                        <option value="Rose Pastel">Rose Pastel</option>
+                        <option value="Vert Menthe">Vert Menthe</option>
+                        <option value="Bleu Ciel">Bleu Ciel</option>
+                    </select>
+                    <button class="add-to-box-btn" onclick="addItem('Trousse Garnie', 'p1-var', 3500, 800)">Ajouter à la box</button>
+                </div>
+
+                <div class="selector-card">
+                    <div class="icon">🖊️</div>
+                    <h4>Stylos bille (lot de 10)</h4>
+                    <p class="price" id="p2-price">1 500 FCFA</p>
+                    <select class="variation-select" id="p2-var">
+                        <option value="Couleurs Pastel">Couleurs Pastel</option>
+                        <option value="Teintes Néon">Teintes Néon</option>
+                    </select>
+                    <button class="add-to-box-btn" onclick="addItem('Stylos Bille (Lot)', 'p2-var', 1500, 350)">Ajouter à la box</button>
+                </div>
+
+                <div class="selector-card">
+                    <div class="icon">🎨</div>
+                    <h4>Stylos pastel (set de 6)</h4>
+                    <p class="price" id="p3-price">2 000 FCFA</p>
+                    <select class="variation-select" id="p3-var">
+                        <option value="Standard">Set Standard</option>
+                    </select>
+                    <button class="add-to-box-btn" onclick="addItem('Stylos Pastel (Set)', 'p3-var', 2000, 650)">Ajouter à la box</button>
+                </div>
+
+                <div class="selector-card">
+                    <div class="icon">📓</div>
+                    <h4>Cahier esthétique A5</h4>
+                    <p class="price" id="p4-price">1 500 FCFA</p>
+                    <select class="variation-select" id="p4-var">
+                        <option value="Couverture Lapin">Couverture Lapin</option>
+                        <option value="Couverture Ours">Couverture Ours</option>
+                        <option value="Couverture Étoiles">Couverture Étoiles</option>
+                    </select>
+                    <button class="add-to-box-btn" onclick="addItem('Cahier A5', 'p4-var', 1500, 500)">Ajouter à la box</button>
+                </div>
+
+            </div>
+
+            <div class="box-summary-panel">
+                <div class="customer-type-toggle">
+                    <div class="toggle-tab active" id="tab-retail" onclick="setCustomerType('retail')">Particulier</div>
+                    <div class="toggle-tab" id="tab-wholesale" onclick="setCustomerType('wholesale')">Grossiste (En Gros)</div>
+                </div>
+
+                <div class="wholesale-notice" id="wholesale-banner">
+                    ⚠️ <strong>Mode Revendeur :</strong> Prix de gros appliqués (Minimum global de 50 000 FCFA pour valider).
+                </div>
+
+                <h3>Contenu de la Box</h3>
+                <ul class="summary-items-list" id="summary-list">
+                    <li style="color: #A09890; text-align: center; padding: 20px 0;">Votre box est vide</li>
+                </ul>
+
+                <div class="total-row">
+                    <span>Total :</span>
+                    <span id="box-total">0 FCFA</span>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" id="cust-name" placeholder="Votre Nom et Prénom" required>
+                </div>
+                <div class="form-group">
+                    <select id="cust-delivery">
+                        <option value="Dakar (Livraison +2000 F)">Livraison Dakar (+2 000 F)</option>
+                        <option value="Banlieue / Pikine / Guédiawaye (+2500 F)">Banlieue (+2 500 F)</option>
+                        <option value="Thiès / Mbour (Envoi +3000 F)">Thiès / Mbour (+3 000 F)</option>
+                        <option value="Autre Région (Envoi +4000 F)">Autre Région (+4 000 F)</option>
+                    </select>
+                </div>
+
+                <button class="submit-order-btn" onclick="sendWhatsAppOrder()">
+                    🟢 Envoyer la commande sur WhatsApp
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // RENSEIGNE TON NUMÉRO DE TÉLÉPHONE ICI (Format international sans le +)
+        // Exemple pour le Sénégal : 22177XXXXXXX ou 22178XXXXXXX
+        const MON_WHATSAPP = "221770000000"; 
+
+        let currentCustomerType = 'retail';
+        let cart = [];
+
+        function setCustomerType(type) {
+            currentCustomerType = type;
+            document.getElementById('tab-retail').classList.toggle('active', type === 'retail');
+            document.getElementById('tab-wholesale').classList.toggle('active', type === 'wholesale');
+            document.getElementById('wholesale-banner').style.display = type === 'wholesale' ? 'block' : 'none';
+
+            document.getElementById('p1-price').innerText = type === 'wholesale' ? "800 FCFA (Gros)" : "3 500 FCFA";
+            document.getElementById('p2-price').innerText = type === 'wholesale' ? "350 FCFA (Gros)" : "1 500 FCFA";
+            document.getElementById('p3-price').innerText = type === 'wholesale' ? "650 FCFA (Gros)" : "2 000 FCFA";
+            document.getElementById('p4-price').innerText = type === 'wholesale' ? "500 FCFA (Gros)" : "1 500 FCFA";
+            
+            recalculateCart();
+        }
+
+        function addItem(name, selectId, retailPrice, wholesalePrice) {
+            const variation = document.getElementById(selectId).value;
+            cart.push({
+                name: name,
+                variation: variation,
+                retailPrice: retailPrice,
+                wholesalePrice: wholesalePrice
+            });
+            recalculateCart();
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            recalculateCart();
+        }
+
+        function recalculateCart() {
+            const listElement = document.getElementById('summary-list');
+            const totalElement = document.getElementById('box-total');
+            const countElement = document.getElementById('cart-count');
+
+            if (cart.length === 0) {
+                listElement.innerHTML = `<li style="color: #A09890; text-align: center; padding: 20px 0;">Votre box est vide</li>`;
+                totalElement.innerText = "0 FCFA";
+                countElement.innerText = "0";
+                return;
+            }
+
+            let total = 0;
+            listElement.innerHTML = '';
+
+            cart.forEach((item, index) => {
+                let price = currentCustomerType === 'wholesale' ? item.wholesalePrice : item.retailPrice;
+                total += price;
+
+                const li = document.createElement('li');
+                li.className = 'summary-item';
+                li.innerHTML = `
+                    <span>${item.name} (${item.variation})</span>
+                    <span>${price.toLocaleString()} F <span class="remove-item" onclick="removeItem(${index})">×</span></span>
+                `;
+                listElement.appendChild(li);
+            });
+
+            totalElement.innerText = `${total.toLocaleString()} FCFA`;
+            countElement.innerText = cart.length;
+        }
+
+        function sendWhatsAppOrder() {
+            const name = document.getElementById('cust-name').value;
+            const delivery = document.getElementById('cust-delivery').value;
+            
+            if(!name) { alert("S'il vous plaît, entrez votre nom."); return; }
+            if(cart.length === 0) { alert("Votre box est vide."); return; }
+
+            let total = 0;
+            let itemsText = "";
+            
+            cart.forEach((item) => {
+                let price = currentCustomerType === 'wholesale' ? item.wholesalePrice : item.retailPrice;
+                total += price;
+                itemsText += `- ${item.name} [Modèle: ${item.variation}] (${price} F)\n`;
+            });
+
+            if(currentCustomerType === 'wholesale' && total < 50000) {
+                alert(`Pour le tarif grossiste, le montant minimum est de 50 000 FCFA. Votre total actuel est de ${total} FCFA.`);
+                return;
+            }
+
+            // Construction du message WhatsApp propre
+            let message = `Bonjour ✨ ! Nouvelle commande sur le site :\n\n`;
+            message += `👤 Client : ${name}\n`;
+            message += `💼 Type : ${currentCustomerType === 'wholesale' ? 'Grossiste / Revendeur' : 'Particulier'}\n`;
+            message += `📍 Option : ${delivery}\n\n`;
+            message += `📦 CONTENU DE LA BOX :\n${itemsText}\n`;
+            message += `💵 TOTAL ARTICLES : ${total.toLocaleString()} FCFA\n\n`;
+            message += `Je souhaite recevoir mon lien Wave / Orange Money pour finaliser le paiement !`;
+
+            // Encodage pour URL internet
+            let whatsappUrl = `https://wa.me/${MON_WHATSAPP}?text=${encodeURIComponent(message)}`;
+            
+            // Ouvre WhatsApp
+            window.open(whatsappUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
